@@ -1,12 +1,14 @@
 package com.example.aaronbrecher.popularmovies.network;
 
+import com.example.aaronbrecher.popularmovies.BuildConfig;
+
 /**
  * Utility Class containing all data for querying the MovieDb API
  */
 
 public class MovieDbApiUtils {
 
-    public static final String API_KEY = ""; //TODO add api key here
+    public static final String API_KEY = BuildConfig.API_KEY; //TODO add api key here
     private static final String BASE_URL = "http://api.themoviedb.org";
     static final String MOVIE_PATH = "/3/movie";
     static final String API_KEY_PARAM_NAME = "api_key";
