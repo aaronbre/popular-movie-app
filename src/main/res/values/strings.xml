@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="filter_label">Sort By</string>
+    <string name="movie_list_released_label">Released:</string>
+    <string name="movie_details_release_label">Release Date</string>
+    <string name="movie_details_rating_label">Avg. Rating</string>
+    <string name="movie_details_plot_label">Plot Synopsis</string>
+</resources>

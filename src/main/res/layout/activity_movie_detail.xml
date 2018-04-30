@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            tools:context="com.example.aaronbrecher.popularmovies.MovieDetailActivity">
+
+            <ImageView
+                android:id="@+id/movie_details_poster_iv"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/poster_placeholder" />
+
+            <TextView
+                android:id="@+id/movie_details_title_tv"
+                style="@style/Base.TextAppearance.AppCompat.Display1"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/movie_details_poster_iv"
+                tools:text="Avengers: Infinity war I" />
+
+            <TextView
+                android:id="@+id/movie_details_release_label"
+                style="@style/caption"
+                android:text="@string/movie_details_release_label"
+                app:layout_constraintTop_toBottomOf="@id/movie_details_title_tv" />
+
+            <TextView
+                android:id="@+id/movie_details_release_tv"
+                style="@style/detailsTextView"
+                app:layout_constraintTop_toBottomOf="@id/movie_details_release_label"
+                tools:text="April 28, 2018" />
+
+            <TextView
+                android:id="@+id/movie_details_ratings_label"
+                style="@style/caption"
+                android:text="@string/movie_details_rating_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/movie_details_title_tv" />
+
+            <TextView
+                android:id="@+id/movie_details_ratings_tv"
+                style="@style/detailsTextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/movie_details_ratings_label"
+                tools:text="7.7" />
+
+            <TextView
+                android:id="@+id/movie_details_plot_label"
+                style="@style/caption"
+                android:text="@string/movie_details_plot_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/movie_details_release_tv" />
+
+            <TextView
+                android:id="@+id/movie_details_plot_tv"
+                style="@style/detailsTextView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/movie_details_plot_label"
+                tools:text="A CIA Agent must rely on reluctant help from a female spy in the North Vietnam jungle in order to pass through enemy lines." />
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+</layout>
