@@ -78,8 +78,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String sortOption = (String) parent.getItemAtPosition(position);
         if (!Objects.equals(sortOption, mSortOption)) {
-            if (Objects.equals(sortOption, POPULAR_MOVIES)) updateAdapter(mPopularMovies);
-            else if(Objects.equals(sortOption, HIGHEST_RATED_MOVIES)) updateAdapter(mHighestRatedMovies);
+            if (Objects.equals(sortOption, POPULAR_MOVIES)){
+                updateAdapter(mPopularMovies);
+                mSortOption = POPULAR_MOVIES;
+            }
+            else if(Objects.equals(sortOption, HIGHEST_RATED_MOVIES)) {
+                mSortOption = HIGHEST_RATED_MOVIES;
+                updateAdapter(mHighestRatedMovies);
+            }
         }
     }
 
@@ -93,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * do not need to query a second time on swithching sort_by
      */
     private void queryMovieDbApi() {
-        mMovieDbService.QueryMovies(MovieDbApiUtils.POPULAR_PARAM, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
+        mMovieDbService.QueryMovies(MovieDbApiUtils.POPULAR_ENDPOINT, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
             @Override
             public void onResponse(Call<MovieDbReturnObject> call, Response<MovieDbReturnObject> response) {
                 List<Movie> movies = response.body().getResults();
@@ -110,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        mMovieDbService.QueryMovies(MovieDbApiUtils.HIGHEST_RATED_PARAM, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
+        mMovieDbService.QueryMovies(MovieDbApiUtils.HIGHEST_RATED_ENDPOINT, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
             @Override
             public void onResponse(Call<MovieDbReturnObject> call, Response<MovieDbReturnObject> response) {
                 List<Movie> movies = response.body().getResults();
