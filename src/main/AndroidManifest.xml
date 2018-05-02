@@ -20,7 +20,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MovieDetailActivity"
-            android:parentActivityName=".MainActivity"></activity>
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/noAppbar"></activity>
     </application>
 
 </manifest>

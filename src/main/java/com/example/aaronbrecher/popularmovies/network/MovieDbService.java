@@ -1,6 +1,8 @@
 package com.example.aaronbrecher.popularmovies.network;
 
 import com.example.aaronbrecher.popularmovies.models.MovieDbReturnObject;
+import com.example.aaronbrecher.popularmovies.models.ReviewsReturnObject;
+import com.example.aaronbrecher.popularmovies.models.TrailersReturnObject;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -19,6 +21,14 @@ public interface MovieDbService {
      * @return the Return object containing a list of all the movies
      */
     @GET(MovieDbApiUtils.MOVIE_PATH + "/{endpoint}")
-    Call<MovieDbReturnObject>QueryMovies(@Path("endpoint") String endpoint,
-                                         @Query(MovieDbApiUtils.API_KEY_PARAM_NAME) String apiKey);
+    Call<MovieDbReturnObject> queryMovies(@Path("endpoint") String endpoint,
+                                          @Query(MovieDbApiUtils.API_KEY_PARAM_NAME) String apiKey);
+
+    @GET(MovieDbApiUtils.MOVIE_PATH + "/{id}" + "/videos")
+    Call<TrailersReturnObject> queryTrailers(@Path("id") String movieId,
+                                             @Query(MovieDbApiUtils.API_KEY_PARAM_NAME) String apiKey);
+
+    @GET(MovieDbApiUtils.MOVIE_PATH + "/{id}" + "/reviews")
+    Call<ReviewsReturnObject> queryReviews(@Path("id") String movieId,
+                                           @Query(MovieDbApiUtils.API_KEY_PARAM_NAME) String apiKey);
 }

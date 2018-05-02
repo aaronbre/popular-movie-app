@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.aaronbrecher.popularmovies.R;
-import com.example.aaronbrecher.popularmovies.databinding.MovieListListItemBinding;
+import com.example.aaronbrecher.popularmovies.databinding.MovieListItemBinding;
 import com.example.aaronbrecher.popularmovies.models.Movie;
 import com.example.aaronbrecher.popularmovies.network.MovieDbApiUtils;
 import com.squareup.picasso.Picasso;
@@ -43,15 +43,12 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
     public MovieListAdapter.MovieListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        return new MovieListViewHolder(MovieListListItemBinding.inflate(inflater, parent, false));
+        return new MovieListViewHolder(MovieListItemBinding.inflate(inflater, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull MovieListAdapter.MovieListViewHolder holder, int position) {
         Movie movie = mMovieList.get(position);
-        Log.i(TAG, "onBindViewHolder: movie name is" + movie.getTitle());
-//        holder.binding.movieListNameTv.setText(movie.getTitle());
-//        holder.binding.movieListReleaseTv.setText(movie.getReleaseDate());
         String imagePath = MovieDbApiUtils.THUMB_IMAGE_BASE_URL + movie.getPosterPath();
         Picasso.get().load(imagePath).fit().placeholder(R.drawable.poster_placeholder).into(holder.binding.movieListPosterIv);
     }
@@ -63,8 +60,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
     }
 
     public class MovieListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private MovieListListItemBinding binding;
-        public MovieListViewHolder(MovieListListItemBinding binding) {
+        private MovieListItemBinding binding;
+        public MovieListViewHolder(MovieListItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             itemView.setOnClickListener(this);

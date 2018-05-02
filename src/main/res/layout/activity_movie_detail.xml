@@ -3,74 +3,138 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <ScrollView
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.constraint.ConstraintLayout
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:contentScrim="?attr/colorPrimary"
+                app:expandedTitleTextAppearance="@style/Base.TextAppearance.AppCompat.Display1"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+                <ImageView
+                    android:id="@+id/movie_details_poster_iv"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    app:layout_collapseMode="parallax" />
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_gravity="top"
+                    android:minHeight="?attr/actionBarSize"
+                    app:layout_collapseMode="pin"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+            </android.support.design.widget.CollapsingToolbarLayout>
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            style="@style/Widget.Design.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:elevation="6dp"
+            android:src="@drawable/ic_favorite_white_24dp"
+            app:layout_anchor="@id/collapsing_toolbar"
+            app:layout_anchorGravity="bottom|end" />
+
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"
-            tools:context="com.example.aaronbrecher.popularmovies.MovieDetailActivity">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <ImageView
-                android:id="@+id/movie_details_poster_iv"
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/poster_placeholder" />
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                tools:context="com.example.aaronbrecher.popularmovies.MovieDetailActivity">
 
-            <TextView
-                android:id="@+id/movie_details_title_tv"
-                style="@style/Base.TextAppearance.AppCompat.Display1"
-                android:textColor="@android:color/black"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/movie_details_poster_iv"
-                tools:text="Avengers: Infinity war I" />
+                <!--<ImageView-->
+                <!--android:id="@+id/movie_details_poster_iv"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="400dp"-->
+                <!--app:layout_constraintEnd_toEndOf="parent"-->
+                <!--app:layout_constraintStart_toStartOf="parent"-->
+                <!--app:layout_constraintTop_toTopOf="parent"-->
+                <!--tools:src="@drawable/poster_placeholder" />-->
 
-            <TextView
-                android:id="@+id/movie_details_release_label"
-                style="@style/caption"
-                android:text="@string/movie_details_release_label"
-                app:layout_constraintTop_toBottomOf="@id/movie_details_title_tv" />
+                <TextView
+                    android:id="@+id/movie_details_title_tv"
+                    style="@style/Base.TextAppearance.AppCompat.Display1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Avengers: Infinity war I" />
 
-            <TextView
-                android:id="@+id/movie_details_release_tv"
-                style="@style/detailsTextView"
-                app:layout_constraintTop_toBottomOf="@id/movie_details_release_label"
-                tools:text="April 28, 2018" />
+                <TextView
+                    android:id="@+id/movie_details_release_label"
+                    style="@style/caption"
+                    android:text="@string/movie_details_release_label"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_title_tv" />
 
-            <TextView
-                android:id="@+id/movie_details_ratings_label"
-                style="@style/caption"
-                android:text="@string/movie_details_rating_label"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/movie_details_title_tv" />
+                <TextView
+                    android:id="@+id/movie_details_release_tv"
+                    style="@style/detailsTextView"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_release_label"
+                    tools:text="April 28, 2018" />
 
-            <TextView
-                android:id="@+id/movie_details_ratings_tv"
-                style="@style/detailsTextView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/movie_details_ratings_label"
-                tools:text="7.7" />
+                <TextView
+                    android:id="@+id/movie_details_ratings_label"
+                    style="@style/caption"
+                    android:text="@string/movie_details_rating_label"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_title_tv" />
 
-            <TextView
-                android:id="@+id/movie_details_plot_label"
-                style="@style/caption"
-                android:text="@string/movie_details_plot_label"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/movie_details_release_tv" />
+                <TextView
+                    android:id="@+id/movie_details_ratings_tv"
+                    style="@style/detailsTextView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_ratings_label"
+                    tools:text="7.7" />
 
-            <TextView
-                android:id="@+id/movie_details_plot_tv"
-                style="@style/detailsTextView"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/movie_details_plot_label"
-                tools:text="A CIA Agent must rely on reluctant help from a female spy in the North Vietnam jungle in order to pass through enemy lines." />
-        </android.support.constraint.ConstraintLayout>
-    </ScrollView>
+                <TextView
+                    android:id="@+id/movie_details_plot_label"
+                    style="@style/caption"
+                    android:text="@string/movie_details_plot_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_release_tv" />
+
+                <TextView
+                    android:id="@+id/movie_details_plot_tv"
+                    style="@style/detailsTextView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_plot_label"
+                    tools:text="A CIA Agent must rely on reluctant help from a female spy in the North Vietnam jungle in order to pass through enemy lines." />
+
+                <TextView
+                    style="@style/caption"
+                    android:id="@+id/movie_details_trailers_label"
+                    android:text="@string/movie_details_trailors_label"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_plot_tv" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/movie_details_trailers_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_trailers_label">
+
+                </android.support.v7.widget.RecyclerView>
+            </android.support.constraint.ConstraintLayout>
+        </android.support.v4.widget.NestedScrollView>
+    </android.support.design.widget.CoordinatorLayout>
 </layout>

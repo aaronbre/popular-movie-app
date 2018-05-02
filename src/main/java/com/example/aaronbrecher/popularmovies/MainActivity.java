@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Surface;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -99,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * do not need to query a second time on swithching sort_by
      */
     private void queryMovieDbApi() {
-        mMovieDbService.QueryMovies(MovieDbApiUtils.POPULAR_ENDPOINT, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
+        mMovieDbService.queryMovies(MovieDbApiUtils.POPULAR_ENDPOINT, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
             @Override
             public void onResponse(Call<MovieDbReturnObject> call, Response<MovieDbReturnObject> response) {
                 List<Movie> movies = response.body().getResults();
@@ -116,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        mMovieDbService.QueryMovies(MovieDbApiUtils.HIGHEST_RATED_ENDPOINT, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
+        mMovieDbService.queryMovies(MovieDbApiUtils.HIGHEST_RATED_ENDPOINT, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
             @Override
             public void onResponse(Call<MovieDbReturnObject> call, Response<MovieDbReturnObject> response) {
                 List<Movie> movies = response.body().getResults();
