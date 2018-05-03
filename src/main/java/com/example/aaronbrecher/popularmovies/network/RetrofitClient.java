@@ -14,7 +14,7 @@ public class RetrofitClient {
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient(String baseUrl){
-        if(retrofit == null){
+        if(retrofit == null || retrofit.baseUrl().toString() != baseUrl){
             //logger to log the http request for debugging can remove for production
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
