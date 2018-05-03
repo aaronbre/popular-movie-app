@@ -5,6 +5,7 @@ import com.example.aaronbrecher.popularmovies.models.youtubeModels.YouTubeTraile
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 /**
  * Created by aaronbrecher on 5/2/18.

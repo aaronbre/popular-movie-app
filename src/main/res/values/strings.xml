@@ -6,4 +6,5 @@
     <string name="movie_details_rating_label">Avg. Rating</string>
     <string name="movie_details_plot_label">Plot Synopsis</string>
     <string name="movie_details_trailors_label">Trailors</string>
+    <string name="movie_details_reviews_label">Reviews</string>
 </resources>

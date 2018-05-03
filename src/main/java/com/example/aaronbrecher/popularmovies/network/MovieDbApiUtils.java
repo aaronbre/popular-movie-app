@@ -18,6 +18,8 @@ public class MovieDbApiUtils {
     public static final String THUMB_IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185";
     public static final String LARGE_IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w500";
 
+    public static final String TRAILER_SITE_YOU_TUBE = "YouTube";
+
     public static MovieDbService createService(){
         return RetrofitClient.getClient(BASE_URL).create(MovieDbService.class);
     }

@@ -1,40 +1,35 @@
 package com.example.aaronbrecher.popularmovies;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.Toolbar;
 
+import com.example.aaronbrecher.popularmovies.adapters.ReviewListAdapter;
 import com.example.aaronbrecher.popularmovies.adapters.TrailerListAdapter;
 import com.example.aaronbrecher.popularmovies.databinding.ActivityMovieDetailBinding;
 import com.example.aaronbrecher.popularmovies.models.Movie;
 import com.example.aaronbrecher.popularmovies.models.Trailer;
-import com.example.aaronbrecher.popularmovies.models.TrailersReturnObject;
 import com.example.aaronbrecher.popularmovies.network.MovieDbApiUtils;
-import com.example.aaronbrecher.popularmovies.network.MovieDbService;
+import com.example.aaronbrecher.popularmovies.viewModels.MovieDetailViewModel;
 import com.squareup.picasso.Picasso;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MovieDetailActivity extends AppCompatActivity implements TrailerListAdapter.ListItemClickListener {
     private Movie mMovie;
-    private Toolbar mToolbar;
     private ActivityMovieDetailBinding mBinding;
-    private MovieDbService movieDbService;
     private TrailerListAdapter mTrailerListAdapter;
+    private ReviewListAdapter mReviewListAdapter;
+    private MovieDetailViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        movieDbService = MovieDbApiUtils.createService();
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
-        mToolbar = mBinding.toolbar;
+        mViewModel = ViewModelProviders.of(this).get(MovieDetailViewModel.class);
 
-        setSupportActionBar(mToolbar);
+        setSupportActionBar(mBinding.toolbar);
         if(getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
@@ -43,8 +38,9 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
         if (intent.hasExtra("movie")) {
             mMovie = intent.getParcelableExtra("movie");
             setTitle(mMovie.getTitle());
-            setUpTrailerRecyclerView();
             populateUiWithMovieDetails();
+            setUpTrailerRecyclerView();
+            setUpReviewsRecyclerView();
         }
     }
 
@@ -63,22 +59,26 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
         mBinding.movieDetailsTrailersRv.setLayoutManager
                 (new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mTrailerListAdapter = new TrailerListAdapter(null, this);
+        mBinding.movieDetailsTrailersRv.setAdapter(mTrailerListAdapter);
+        mViewModel.queryTrailerListForId(String.valueOf(mMovie.getId()));
+
+        mViewModel.getTrailers().observe(this, trailers -> {
+            mTrailerListAdapter.swapLists(trailers);
+        });
     }
 
-    private void queryTrailers(Integer id) {
-        movieDbService.queryTrailers(String.valueOf(id), BuildConfig.MOVIE_DB_API_KEY)
-                .enqueue(new Callback<TrailersReturnObject>() {
-                    @Override
-                    public void onResponse(Call<TrailersReturnObject> call, Response<TrailersReturnObject> response) {
+    private void setUpReviewsRecyclerView(){
+        mBinding.movieDetailsReviewsRv.setLayoutManager
+                (new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        mReviewListAdapter = new ReviewListAdapter(null);
+        mBinding.movieDetailsReviewsRv.setAdapter(mReviewListAdapter);
+        mViewModel.queryReviewListForId(String.valueOf(mMovie.getId()));
 
-                    }
-
-                    @Override
-                    public void onFailure(Call<TrailersReturnObject> call, Throwable t) {
-
-                    }
-                });
+        mViewModel.getReviews().observe(this, reviews -> {
+            mReviewListAdapter.swapLists(reviews);
+        });
     }
+
 
     @Override
     public void onListItemClick(Trailer trailer) {

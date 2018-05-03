@@ -121,8 +121,8 @@
                     tools:text="A CIA Agent must rely on reluctant help from a female spy in the North Vietnam jungle in order to pass through enemy lines." />
 
                 <TextView
-                    style="@style/caption"
                     android:id="@+id/movie_details_trailers_label"
+                    style="@style/caption"
                     android:text="@string/movie_details_trailors_label"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/movie_details_plot_tv" />
@@ -132,6 +132,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@id/movie_details_trailers_label">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <TextView
+                    android:id="@+id/movie_details_reviews_label"
+                    style="@style/caption"
+                    android:text="@string/movie_details_reviews_label"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_trailers_rv" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/movie_details_reviews_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/movie_details_reviews_label">
 
                 </android.support.v7.widget.RecyclerView>
             </android.support.constraint.ConstraintLayout>
