@@ -23,13 +23,13 @@ public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.Re
     private TrailerListAdapter.ListItemClickListener mClickListener;
 
 
-    public ReviewListAdapter(List<Review> reviews) {
+    public ReviewListAdapter(List<Review> reviews,  TrailerListAdapter.ListItemClickListener clickListener) {
         mReviewList = reviews;
+        mClickListener = clickListener;
     }
 
-    public void swapLists(List<Review> movieList, TrailerListAdapter.ListItemClickListener clickListener){
+    public void swapLists(List<Review> movieList){
         mReviewList = movieList;
-        mClickListener = clickListener;
         notifyDataSetChanged();
     }
 

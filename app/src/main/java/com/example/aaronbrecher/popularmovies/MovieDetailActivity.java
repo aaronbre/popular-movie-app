@@ -3,9 +3,11 @@ package com.example.aaronbrecher.popularmovies;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 
 import com.example.aaronbrecher.popularmovies.adapters.ReviewListAdapter;
 import com.example.aaronbrecher.popularmovies.adapters.TrailerListAdapter;
@@ -70,7 +72,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
     private void setUpReviewsRecyclerView(){
         mBinding.movieDetailsReviewsRv.setLayoutManager
                 (new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        mReviewListAdapter = new ReviewListAdapter(null);
+        mReviewListAdapter = new ReviewListAdapter(null, this);
         mBinding.movieDetailsReviewsRv.setAdapter(mReviewListAdapter);
         mViewModel.queryReviewListForId(String.valueOf(mMovie.getId()));
 
@@ -81,7 +83,10 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
 
 
     @Override
-    public void onListItemClick(Trailer trailer) {
-
+    public void onListItemClick(String url) {
+        Log.i("Click","onListItemClick: ");
+        Uri uri = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
     }
 }
