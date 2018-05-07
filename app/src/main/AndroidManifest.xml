@@ -21,7 +21,12 @@
         </activity>
         <activity android:name=".MovieDetailActivity"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/noAppbar"></activity>
+            android:theme="@style/noAppbar"/>
+
+        <provider
+            android:authorities="com.example.aaronbrecher.popularmovies"
+            android:name="com.example.aaronbrecher.popularmovies.data.MovieContentProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

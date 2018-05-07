@@ -5,7 +5,7 @@
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
@@ -41,6 +41,7 @@
         </android.support.design.widget.AppBarLayout>
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/favorite_fab"
             style="@style/Widget.Design.FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -97,6 +98,9 @@
                     style="@style/detailsTextView"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/movie_details_ratings_label"
+                    android:background="@color/colorAccent"
+                    android:textColor="@android:color/white"
+                    android:padding="3dp"
                     tools:text="7.7" />
 
                 <TextView

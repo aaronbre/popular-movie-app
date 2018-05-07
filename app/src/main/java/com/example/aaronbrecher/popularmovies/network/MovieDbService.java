@@ -1,5 +1,6 @@
 package com.example.aaronbrecher.popularmovies.network;
 
+import com.example.aaronbrecher.popularmovies.models.Movie;
 import com.example.aaronbrecher.popularmovies.models.MovieDbReturnObject;
 import com.example.aaronbrecher.popularmovies.models.ReviewsReturnObject;
 import com.example.aaronbrecher.popularmovies.models.TrailersReturnObject;
@@ -31,4 +32,8 @@ public interface MovieDbService {
     @GET(MovieDbApiUtils.MOVIE_PATH + "/{id}" + "/reviews")
     Call<ReviewsReturnObject> queryReviews(@Path("id") String movieId,
                                            @Query(MovieDbApiUtils.API_KEY_PARAM_NAME) String apiKey);
+
+    @GET(MovieDbApiUtils.MOVIE_PATH + "/{id}")
+    Call<Movie> queryMovieForId(@Path("id") String movieId,
+                                @Query(MovieDbApiUtils.API_KEY_PARAM_NAME) String apiKey);
 }
