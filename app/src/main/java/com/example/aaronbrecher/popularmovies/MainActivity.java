@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String mSortOption = POPULAR_MOVIES;
     List<Movie> mPopularMovies;
     List<Movie> mHighestRatedMovies;
+    Cursor mFavoriteMovies;
     MovieDbService mMovieDbService;
     MovieListAdapter mListAdapter;
 
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        //TODO bug when switching sortOption loses the list
         String sortOption = (String) parent.getItemAtPosition(position);
         if (!Objects.equals(sortOption, mSortOption)) {
             if (Objects.equals(sortOption, POPULAR_MOVIES)){
@@ -96,8 +98,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 mListAdapter.swapLists(mHighestRatedMovies);
             }
             else if(Objects.equals(sortOption, FAVORITE_MOVIES)){
-                //TODO load the cursor and swap it with existing cursor
-               getLoaderManager().initLoader(FAVORITE_LOADER_ID, null, this);
+               if(getLoaderManager().getLoader(FAVORITE_LOADER_ID) == null){
+                   getLoaderManager().initLoader(FAVORITE_LOADER_ID, null, this);
+               }else {
+                   getLoaderManager().restartLoader(FAVORITE_LOADER_ID, null, this);
+               }
+               mSortOption = FAVORITE_MOVIES;
             }
         }
     }
@@ -152,40 +158,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<Cursor>(this) {
-            Cursor mData;
-            @Override
-            protected void onStartLoading() {
-                if(mData != null) deliverResult(mData);
-                else forceLoad();
-            }
-
-            @Override
-            public Cursor loadInBackground() {
-                try{
-                    return getContentResolver().query(MovieContract.FavoriteEntry.CONTENT_URI,
-                            null,
-                            null,
-                            null,
-                            MovieContract.FavoriteEntry._ID);
-                }catch (Exception e){
-                    Log.e(TAG, "loadInBackground: Failed to load favorites", e);
-                    e.printStackTrace();
-                    return null;
+            return new AsyncTaskLoader<Cursor>(this) {
+                Cursor mData;
+                @Override
+                protected void onStartLoading() {
+                    if(mData != null) deliverResult(mData);
+                    else forceLoad();
                 }
-            }
 
-            @Override
-            public void deliverResult(Cursor data) {
-                mData = data;
-                super.deliverResult(data);
-            }
-        };
-    }
+                @Override
+                public Cursor loadInBackground() {
+                    try{
+                        return getContentResolver().query(MovieContract.FavoriteEntry.CONTENT_URI,
+                                null,
+                                null,
+                                null,
+                                MovieContract.FavoriteEntry._ID);
+                    }catch (Exception e){
+                        Log.e(TAG, "loadInBackground: Failed to load favorites", e);
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+
+                @Override
+                public void deliverResult(Cursor data) {
+                    mData = data;
+                    super.deliverResult(data);
+                }
+            };
+        }
+
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mListAdapter.swapLists(data);
+        mFavoriteMovies = data;
+        mListAdapter.swapLists(mFavoriteMovies);
     }
 
     @Override

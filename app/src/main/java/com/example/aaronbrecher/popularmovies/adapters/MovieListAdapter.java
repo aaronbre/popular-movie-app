@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.example.aaronbrecher.popularmovies.R;
 import com.example.aaronbrecher.popularmovies.data.MovieContract;
+import com.example.aaronbrecher.popularmovies.data.MovieContract.FavoriteEntry;
 import com.example.aaronbrecher.popularmovies.databinding.MovieListItemBinding;
 import com.example.aaronbrecher.popularmovies.models.Movie;
 import com.example.aaronbrecher.popularmovies.network.MovieDbApiUtils;
@@ -39,9 +40,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
     public MovieListAdapter(List<Movie> movies, ListItemClickListener clickListener, Cursor movieCursor) {
         mMovieList = movies;
         mClickListener = clickListener;
-//        if(movieCursor != null){
-//            mMovieList = convertCursorToMovieList(movieCursor);
-//        }
     }
 
     public void swapLists(List<Movie> movieList){
@@ -55,6 +53,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
             swapLists(new ArrayList<>());
             convertCursorToMovieList(cursor);
             notifyDataSetChanged();
+            cursor.close();
         }
     }
 
@@ -67,23 +66,22 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
      */
     //Todo create a List from the cursor and set the MovieList to that
     private void convertCursorToMovieList(Cursor movieCursor) {
-        MovieDbService service = MovieDbApiUtils.createService();
         while (movieCursor.moveToNext()){
-            int movieIdIndex = movieCursor.getColumnIndex(MovieContract.FavoriteEntry.COLUMN_MOVIE_ID);
-            String id = movieCursor.getString(movieIdIndex);
-            service.queryMovieForId(id, MovieDbApiUtils.API_KEY).enqueue(new Callback<Movie>() {
-                @Override
-                public void onResponse(Call<Movie> call, Response<Movie> response) {
-                    Movie movie = response.body();
-                    mMovieList.add(movie);
-                    notifyDataSetChanged();
-                }
+            Movie movie = new Movie();
+            int titleIndex = movieCursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_TITLE);
+            int plotIndex = movieCursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_OVERVIEW);
+            int voteIndex = movieCursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_VOTE_AVERAGE);
+            int releaseIndex = movieCursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_RELEASE);
+            int idIndex = movieCursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_ID);
+            int posterIndex = movieCursor.getColumnIndex(FavoriteEntry.COLUMN_MOVIE_POSTER_PATH);
 
-                @Override
-                public void onFailure(Call<Movie> call, Throwable t) {
-
-                }
-            });
+            movie.setOriginalTitle(movieCursor.getString(titleIndex));
+            movie.setOverview(movieCursor.getString(plotIndex));
+            movie.setVoteAverage(movieCursor.getDouble(voteIndex));
+            movie.setReleaseDate(movieCursor.getString(releaseIndex));
+            movie.setId(movieCursor.getInt(idIndex));
+            movie.setPosterPath(movieCursor.getString(posterIndex));
+            mMovieList.add(movie);
         }
     }
 

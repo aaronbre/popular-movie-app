@@ -21,7 +21,12 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         final String CREATE_TABLE = "CREATE TABLE " + FavoriteEntry.TABLE_NAME + " (" +
                 FavoriteEntry._ID               + " INTEGER, " +
-                FavoriteEntry.COLUMN_MOVIE_ID   + " TEXT PRIMARY KEY);";
+                FavoriteEntry.COLUMN_MOVIE_OVERVIEW + " TEXT, " +
+                FavoriteEntry.COLUMN_MOVIE_TITLE    + " TEXT, " +
+                FavoriteEntry.COLUMN_MOVIE_POSTER_PATH + " TEXT, " +
+                FavoriteEntry.COLUMN_MOVIE_VOTE_AVERAGE + " REAL, " +
+                FavoriteEntry.COLUMN_MOVIE_RELEASE + " TEXT, " +
+                FavoriteEntry.COLUMN_MOVIE_ID   + " INTEGER PRIMARY KEY);";
         db.execSQL(CREATE_TABLE);
     }
 

@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.aaronbrecher.popularmovies.adapters.ReviewListAdapter;
 import com.example.aaronbrecher.popularmovies.adapters.TrailerListAdapter;
 import com.example.aaronbrecher.popularmovies.data.MovieContract;
+import com.example.aaronbrecher.popularmovies.data.MovieContract.FavoriteEntry;
 import com.example.aaronbrecher.popularmovies.databinding.ActivityMovieDetailBinding;
 import com.example.aaronbrecher.popularmovies.models.Movie;
 import com.example.aaronbrecher.popularmovies.models.Trailer;
@@ -62,33 +63,46 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
             setUpUi();
         }
 
+        /**
+         * Set up the fab. Will add to the database of favorites. If already a favorite will
+         * remove from db
+         */
         mBinding.favoriteFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!isFavorite){
-                    ContentValues values = new ContentValues();
-                    values.put(MovieContract.FavoriteEntry.COLUMN_MOVIE_ID, String.valueOf(mMovie.getId()));
-                    Uri uri = getContentResolver().insert(MovieContract.FavoriteEntry.CONTENT_URI, values);
+                    Uri uri = getContentResolver().insert(FavoriteEntry.CONTENT_URI, createContentValues());
                     if(uri != null){
-                        Toast.makeText(MovieDetailActivity.this, uri.toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MovieDetailActivity.this, mMovie.getOriginalTitle() + " was added to favorites",
+                                Toast.LENGTH_SHORT).show();
                         isFavorite = true;
                         toggleFabDesign();
                     }
                 }
                 else {
-                    //todo delete from favorites
-                    Uri uri = MovieContract.FavoriteEntry.CONTENT_URI.buildUpon()
+                    Uri uri = FavoriteEntry.CONTENT_URI.buildUpon()
                             .appendPath(String.valueOf(mMovie.getId())).build();
                     int deleted = getContentResolver().delete(uri,null, null);
                     if(deleted != 0){
-                        Toast.makeText(MovieDetailActivity.this, "Deleted movie at position" + deleted, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MovieDetailActivity.this, "Deleted " + mMovie.getOriginalTitle() + " from your favorites",
+                                Toast.LENGTH_SHORT).show();
                         isFavorite = false;
                         toggleFabDesign();
                     }
-
                 }
             }
         });
+    }
+
+    private ContentValues createContentValues() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FavoriteEntry.COLUMN_MOVIE_ID, mMovie.getId());
+        contentValues.put(FavoriteEntry.COLUMN_MOVIE_OVERVIEW, mMovie.getOverview());
+        contentValues.put(FavoriteEntry.COLUMN_MOVIE_POSTER_PATH, mMovie.getPosterPath());
+        contentValues.put(FavoriteEntry.COLUMN_MOVIE_TITLE, mMovie.getOriginalTitle());
+        contentValues.put(FavoriteEntry.COLUMN_MOVIE_RELEASE, mMovie.getReleaseDate());
+        contentValues.put(FavoriteEntry.COLUMN_MOVIE_VOTE_AVERAGE, mMovie.getVoteAverage());
+        return contentValues;
     }
 
     private void setUpUi() {
@@ -98,6 +112,9 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
         setUpFavorite();
     }
 
+    /**
+     * Populate all the basic fields - text, image, etc.
+     */
     private void populateUiWithMovieDetails() {
         mBinding.movieDetailsTitleTv.setText(mMovie.getOriginalTitle());
         mBinding.movieDetailsRatingsTv.setText(String.valueOf(mMovie.getVoteAverage()));
@@ -108,6 +125,10 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
                 .into(mBinding.movieDetailsPosterIv);
     }
 
+    /**
+     * set up the trailer recyclerView, will use LiveData from the ViewModel with a Retrofit
+     * query to set up
+     */
     private void setUpTrailerRecyclerView() {
         mBinding.movieDetailsTrailersRv.setLayoutManager
                 (new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -120,6 +141,10 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
         });
     }
 
+    /**
+     * Set up the reviews this as well will use LiveData as well as
+     * retrofit
+     */
     private void setUpReviewsRecyclerView(){
         mBinding.movieDetailsReviewsRv.setLayoutManager
                 (new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -132,7 +157,11 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
         });
     }
 
-
+    /**
+     * launch the trailer on youtube or browser (will also
+     * send the user to the full review when clicking the review)
+     * @param url - the url for the intent
+     */
     @Override
     public void onListItemClick(String url) {
         Log.i("Click","onListItemClick: ");
@@ -145,6 +174,10 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
         getLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
+    /**
+     * The loader to be used for accessing the database via the
+     * content Provider
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<Cursor>(this) {
@@ -158,13 +191,13 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
             @Override
             public Cursor loadInBackground() {
                 try{
-                    Uri uri = MovieContract.FavoriteEntry.CONTENT_URI.buildUpon()
+                    Uri uri = FavoriteEntry.CONTENT_URI.buildUpon()
                             .appendPath(String.valueOf(mMovie.getId())).build();
                     return getContentResolver().query(uri,
                             null,
                             null,
                             null,
-                             MovieContract.FavoriteEntry._ID);
+                             FavoriteEntry._ID);
                 }catch (Exception e){
                     Log.e(TAG, "loadInBackground: Failed to load async data", e);
                     e.printStackTrace();
@@ -197,6 +230,10 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
 
     }
 
+    /**
+     * Method to change the design of the fabButton according to it
+     * being a favorite or not
+     */
     private void toggleFabDesign() {
         if(!isFavorite){
             mBinding.favoriteFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
