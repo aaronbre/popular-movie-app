@@ -1,11 +1,13 @@
 package com.example.aaronbrecher.popularmovies;
 
 import android.app.LoaderManager;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.AsyncTaskLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -19,18 +21,12 @@ import android.widget.Spinner;
 import com.example.aaronbrecher.popularmovies.adapters.MovieListAdapter;
 import com.example.aaronbrecher.popularmovies.data.MovieContract;
 import com.example.aaronbrecher.popularmovies.models.Movie;
-import com.example.aaronbrecher.popularmovies.models.MovieDbReturnObject;
-import com.example.aaronbrecher.popularmovies.network.MovieDbApiUtils;
-import com.example.aaronbrecher.popularmovies.network.MovieDbService;
+import com.example.aaronbrecher.popularmovies.network.NetworkUtils;
+import com.example.aaronbrecher.popularmovies.viewModels.MainActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
         MovieListAdapter.ListItemClickListener, LoaderManager.LoaderCallbacks<Cursor>{
@@ -39,24 +35,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String HIGHEST_RATED_MOVIES = "Highest Rated";
     public static final String FAVORITE_MOVIES = "Favorite";
     private static final String TAG = MainActivity.class.getSimpleName();
-
     public static final int FAVORITE_LOADER_ID = 1;
+    private static final String SORT_OPTION = "sortOption";
 
     RecyclerView mRecyclerView;
     Spinner mSortSpinner;
-    String mSortOption = POPULAR_MOVIES;
-    List<Movie> mPopularMovies;
-    List<Movie> mHighestRatedMovies;
+    String mSortOption;
     Cursor mFavoriteMovies;
-    MovieDbService mMovieDbService;
     MovieListAdapter mListAdapter;
+    MainActivityViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState != null && savedInstanceState.containsKey(SORT_OPTION))
+            mSortOption = savedInstanceState.getString(SORT_OPTION);
         setContentView(R.layout.activity_main);
-        //create the MovieDbService to query the API
-        mMovieDbService = MovieDbApiUtils.createService();
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         mRecyclerView = findViewById(R.id.movie_list_rv);
         mSortSpinner = findViewById(R.id.sort_options_spinner);
@@ -64,8 +59,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mRecyclerView.setAdapter(mListAdapter);
         int spanCount = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? 3 : 2;
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
+
         setUpSpinner();
-        queryMovieDbApi();
+        retrieveData();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SORT_OPTION, mSortOption);
     }
 
     /**
@@ -78,32 +80,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 R.layout.sort_spinner_item, options);
         mSortSpinner.setAdapter(adapter);
-        mSortSpinner.setSelection(0);
-        mSortOption = adapter.getItem(0);
+        int position;
+        if(mSortOption == null) position = 0;
+        else position = adapter.getPosition(mSortOption);
+        mSortSpinner.setSelection(position);
+        mSortOption = adapter.getItem(position);
         mSortSpinner.setOnItemSelectedListener(this);
 
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        //TODO bug when switching sortOption loses the list
         String sortOption = (String) parent.getItemAtPosition(position);
         if (!Objects.equals(sortOption, mSortOption)) {
             if (Objects.equals(sortOption, POPULAR_MOVIES)){
-                mListAdapter.swapLists(mPopularMovies);
+                mListAdapter.swapLists(viewModel.getPopular().getValue());
                 mSortOption = POPULAR_MOVIES;
             }
             else if(Objects.equals(sortOption, HIGHEST_RATED_MOVIES)) {
                 mSortOption = HIGHEST_RATED_MOVIES;
-                mListAdapter.swapLists(mHighestRatedMovies);
+                mListAdapter.swapLists(viewModel.getHighestRated().getValue());
             }
             else if(Objects.equals(sortOption, FAVORITE_MOVIES)){
-               if(getLoaderManager().getLoader(FAVORITE_LOADER_ID) == null){
+                mSortOption = FAVORITE_MOVIES;
+                if(getLoaderManager().getLoader(FAVORITE_LOADER_ID) == null){
                    getLoaderManager().initLoader(FAVORITE_LOADER_ID, null, this);
                }else {
                    getLoaderManager().restartLoader(FAVORITE_LOADER_ID, null, this);
                }
-               mSortOption = FAVORITE_MOVIES;
             }
         }
     }
@@ -117,36 +121,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * Query both options (popular and highest rated) to cache the results so
      * do not need to query a second time on swithching sort_by
      */
-    private void queryMovieDbApi() {
-        mMovieDbService.queryMovies(MovieDbApiUtils.POPULAR_ENDPOINT, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
-            @Override
-            public void onResponse(Call<MovieDbReturnObject> call, Response<MovieDbReturnObject> response) {
-                List<Movie> movies = response.body().getResults();
-                Log.i("MovieDBAPI", "onResponse: " + movies.toString());
-                if (movies.size() > 0) {
-                    mListAdapter.swapLists(movies);
-                    mPopularMovies = movies;
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MovieDbReturnObject> call, Throwable t) {
-                Log.d("MOVIEDPAPI", "onFailure: Error retrieving movies" + t);
-            }
+    private void retrieveData() {
+        viewModel.queryMovieDb();
+        viewModel.getHighestRated().observe(this,movies -> {
+            if(Objects.equals(mSortOption, HIGHEST_RATED_MOVIES)) mListAdapter.swapLists(movies);
         });
-
-        mMovieDbService.queryMovies(MovieDbApiUtils.HIGHEST_RATED_ENDPOINT, MovieDbApiUtils.API_KEY).enqueue(new Callback<MovieDbReturnObject>() {
-            @Override
-            public void onResponse(Call<MovieDbReturnObject> call, Response<MovieDbReturnObject> response) {
-                List<Movie> movies = response.body().getResults();
-                if (movies != null && movies.size() > 0) mHighestRatedMovies = movies;
-            }
-
-            @Override
-            public void onFailure(Call<MovieDbReturnObject> call, Throwable t) {
-                Log.d("MOVIEDPAPI", "onFailure: ERROR");
-            }
+        viewModel.getPopular().observe(this, movies -> {
+            if(Objects.equals(mSortOption, POPULAR_MOVIES)) mListAdapter.swapLists(movies);
         });
+        getLoaderManager().initLoader(FAVORITE_LOADER_ID, null, this);
     }
 
     @Override
@@ -193,11 +176,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mFavoriteMovies = data;
-        mListAdapter.swapLists(mFavoriteMovies);
+        if(Objects.equals(mSortOption, FAVORITE_MOVIES)) mListAdapter.swapLists(mFavoriteMovies);
+        else if(!NetworkUtils.hasNetworkConnection(this)){
+            mSortOption = FAVORITE_MOVIES;
+            int postion = ((ArrayAdapter) mSortSpinner.getAdapter()).getPosition(mSortOption);
+            mSortSpinner.setSelection(postion);
+            mListAdapter.swapLists(mFavoriteMovies);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mListAdapter.swapLists((Cursor) null);
+    }
+
+
+    // if we are resuming the activity it is possible the favorites will be out of sync
+    // for ex. if a movie was removed from favorites and we are returning to the
+    // favorites list
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(Objects.equals(mSortOption, FAVORITE_MOVIES)) getLoaderManager().restartLoader(FAVORITE_LOADER_ID, null, this);
     }
 }

@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -93,6 +94,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
             }
         });
     }
+
 
     private ContentValues createContentValues() {
         ContentValues contentValues = new ContentValues();
@@ -241,6 +243,19 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerLis
         }else{
             mBinding.favoriteFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
             mBinding.favoriteFab.setImageResource(R.drawable.ic_favorite_white_24dp);
+        }
+    }
+
+    // overriding back button so as not to recreate activity,
+    // doing so will cause the sort option to return to default
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
